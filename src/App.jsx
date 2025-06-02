@@ -6,6 +6,9 @@ import ProfilePage from './components/ProfilePage'
 import RegisterPage from './components/RegisterPage'
 import WritePage from './components/WritePage'
 import PostCard from './components/PostCard'
+import PostDetailPage from './components/PostDetailPage'
+import ParticipatePage from './components/ParticipatePage'
+import ChattingPage from './components/ChattingPage'
 
 const dummyPosts = [
   { id: 1, title: '생수 2L 인당 2개씩 공동구매할 분 구합니다', category: '생수', current: 2, total: 3 },
@@ -16,6 +19,7 @@ const dummyPosts = [
 function App() {
   const [page, setPage] = useState('main')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [selectedPost, setSelectedPost] = useState(null)
 
   const renderPage = () => {
     switch (page) {
@@ -49,6 +53,21 @@ function App() {
         return <RegisterPage onBack={() => setPage('profile')} />
       case 'write':
         return <WritePage onBack={() => setPage('main')} />
+      case 'detail':
+        return (
+          <PostDetailPage
+            post={selectedPost}
+            onBack={() => setPage('main')}
+            onParticipate={() => setPage('participate')}
+          />
+        )
+      case 'participate':
+        return <ParticipatePage 
+          onBack={() => setPage('detail')} 
+          onChatting={() => setPage('chatting')}
+          />
+      case 'chatting':
+        return <ChattingPage onBack={() => setPage('participate')} />
       default:
         return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -68,13 +87,17 @@ function App() {
 
             <div style={{ flex: 1, overflowY: 'auto' }}>
               {dummyPosts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  title={post.title}
-                  category={post.category}
-                  current={post.current}
-                  total={post.total}
-                />
+                <div key={post.id} onClick={() => {
+                  setSelectedPost(post);
+                  setPage('detail');
+                }}>
+                  <PostCard
+                    title={post.title}
+                    category={post.category}
+                    current={post.current}
+                    total={post.total}
+                  />
+                </div>
               ))}
             </div>
 

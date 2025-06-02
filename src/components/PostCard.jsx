@@ -1,18 +1,28 @@
 import React from 'react'
 
-function PostCard({ title, category, current, total }) {
+function PostCard({ title, category, current, total, onClick }) {
   return (
-    <div style={{ display: 'flex', padding: '16px', borderBottom: '1px solid #ddd' }}>
-      <div style={{
-        width: 80,
-        height: 80,
-        borderRadius: 20,
-        backgroundColor: '#e6f0ff',
+    <div
+      onClick={onClick}
+      style={{
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: 16,
-      }}>
+        padding: '16px',
+        borderBottom: '1px solid #ddd',
+        cursor: 'pointer',
+      }}
+    >
+      <div
+        style={{
+          width: 80,
+          height: 80,
+          borderRadius: 20,
+          backgroundColor: '#e6f0ff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginRight: 16,
+        }}
+      >
         <span role="img" aria-label="image">🖼️</span>
       </div>
       <div style={{ flex: 1 }}>
@@ -23,7 +33,7 @@ function PostCard({ title, category, current, total }) {
             marginTop: 8,
             fontWeight: 'bold',
             textAlign: 'center',
-            color: '#007bff'
+            color: '#007bff',
           }}>
             {current}/{total}
           </div>
