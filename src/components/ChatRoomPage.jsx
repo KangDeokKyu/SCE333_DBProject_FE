@@ -2,17 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Header from "./Header";
 
-/**
- * ChatRoomPage
- *
- * - rooms: 초기 채팅방 목록 배열 (각 방은 { id, title } 형태)
- * - onBack: 뒤로가기(메인/이전 화면으로 돌아가기) 콜백
- *
- * “나가기(환불)”를 누르면 환불 페이지가 나타나며,
- * “환불 요청하기” 버튼을 누르면 해당 채팅방이 목록에서 제거됩니다.
- */
 function ChatRoomPage({ rooms: initialRooms, onBack }) {
-  // 1) roomsState: 현재 참여 중인 채팅방을 { id, name, messages: [] } 형태로 관리
   const [roomsState, setRoomsState] = useState(
     initialRooms.map((p) => ({
       id: p.id,
@@ -21,19 +11,11 @@ function ChatRoomPage({ rooms: initialRooms, onBack }) {
     }))
   );
 
-  // 2) selectedRoomId: null이면 목록 뷰, 숫자면 해당 채팅방 뷰
   const [selectedRoomId, setSelectedRoomId] = useState(null);
-
-  // 3) newMessage: 채팅 입력 중인 텍스트
   const [newMessage, setNewMessage] = useState("");
-
-  // 4) refundRoomId: 환불 페이지를 띄워야 하는 방 ID (null이면 환불 페이지 미표시)
   const [refundRoomId, setRefundRoomId] = useState(null);
-
-  // 5) 스크롤 자동 이동용 ref
   const messagesEndRef = useRef(null);
 
-  // messages가 바뀌거나 채팅방 진입할 때 스크롤을 최하단으로 내린다
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -111,9 +93,7 @@ function ChatRoomPage({ rooms: initialRooms, onBack }) {
   const handleRequestRefund = () => {
     alert("환불 요청이 접수되었습니다."); // 실제 API 호출 로직으로 대체 가능
 
-    setRoomsState((prev) =>
-      prev.filter((room) => room.id !== refundRoomId)
-    );
+    setRoomsState((prev) => prev.filter((room) => room.id !== refundRoomId));
     setRefundRoomId(null);
     setSelectedRoomId(null);
   };
@@ -142,9 +122,14 @@ function ChatRoomPage({ rooms: initialRooms, onBack }) {
     };
 
     return (
-      <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <div
+        style={{ display: "flex", flexDirection: "column", height: "100vh" }}
+      >
         {/* 상단 헤더: ← 환불 요청 페이지 제목 */}
-        <Header title="환불계좌와 금액을 확인해주세요" onBack={handleRefundBack} />
+        <Header
+          title="환불계좌와 금액을 확인해주세요"
+          onBack={handleRefundBack}
+        />
 
         {/* 본문: 은행명 + 계좌번호, 환불금액 */}
         <div style={{ flex: 1, padding: 16, backgroundColor: "#f5f5f5" }}>
@@ -187,7 +172,13 @@ function ChatRoomPage({ rooms: initialRooms, onBack }) {
         </div>
 
         {/* 하단 고정: 환불 요청하기 버튼 */}
-        <div style={{ padding: 16, borderTop: "1px solid #ddd", backgroundColor: "#fff" }}>
+        <div
+          style={{
+            padding: 16,
+            borderTop: "1px solid #ddd",
+            backgroundColor: "#fff",
+          }}
+        >
           <button
             onClick={handleRequestRefund}
             style={{
@@ -213,7 +204,9 @@ function ChatRoomPage({ rooms: initialRooms, onBack }) {
   // (B) refundRoomId가 null이면서 selectedRoomId도 null → “채팅방 목록” 화면
   if (selectedRoomId === null) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <div
+        style={{ display: "flex", flexDirection: "column", height: "100vh" }}
+      >
         {/* 상단 헤더: 뒤로가기 + 채팅방 목록 */}
         <Header title="채팅방 목록" onBack={onBack} />
 
