@@ -4,14 +4,7 @@ import Header from "./Header";
 function PostDetailPage({ post, onBack, onParticipate }) {
   // 1) 댓글 데이터를 저장할 state
   //    replies: [] 배열을 추가하여 대댓글을 관리할 수 있도록 함
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      author: "익명",
-      content: "댓글 예시입니다.",
-      replies: [], // 이 댓글에 딸린 대댓글을 저장할 배열
-    },
-  ]);
+  const [comments, setComments] = useState([]);
 
   // 2) 새로운 댓글 입력값
   const [newComment, setNewComment] = useState("");

@@ -53,36 +53,6 @@ function WritePage({ onBack }) {
       alert('제목, 내용, 마감일을 모두 입력해주세요.')
       return
     }
-
-    // 2) 서버에 보낼 폼데이터(FormData) 생성 예시
-    // 실제 API가 없으시면 이 부분을 주석 처리하거나 mock 로직으로 교체하세요.
-    /*
-    const formData = new FormData()
-    formData.append('title', title)
-    formData.append('content', content)
-    formData.append('maxParticipants', maxParticipants)
-    formData.append('deadline', deadline)
-    // images 배열에 담긴 File 객체를 모두 전송
-    images.forEach((file, idx) => {
-      formData.append(`images`, file)
-    })
-
-    fetch('/api/posts', {
-      method: 'POST',
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        // 저장 성공 후 메인 화면으로 돌아가기
-        onBack()
-      })
-      .catch((err) => {
-        console.error(err)
-        alert('게시글 작성 중 오류가 발생했습니다.')
-      })
-    */
-
-    // 3) 현재는 실제 API 호출 없이 바로 뒤로 돌아가는 예시
     onBack()
   }
 
