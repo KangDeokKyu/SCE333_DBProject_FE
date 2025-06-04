@@ -1,4 +1,3 @@
-// src/components/WritePage.jsx
 import { useState, useRef } from 'react'
 import Header from './Header'
 

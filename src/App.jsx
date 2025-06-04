@@ -1,3 +1,4 @@
+// src/App.jsx
 import React, { useState } from 'react'
 import SearchPage from './components/SearchPage'
 import NotificationPage from './components/NotificationPage'
@@ -9,6 +10,7 @@ import PostCard from './components/PostCard'
 import PostDetailPage from './components/PostDetailPage'
 import ParticipatePage from './components/ParticipatePage'
 import ChattingPage from './components/ChattingPage'
+import ChatRoomPage from './components/ChatRoomPage' // 추가
 
 const dummyPosts = [
   { id: 1, title: '생수 2L 인당 2개씩 공동구매할 분 구합니다', category: '생수', current: 2, total: 3 },
@@ -25,8 +27,10 @@ function App() {
     switch (page) {
       case 'search':
         return <SearchPage onBack={() => setPage('main')} />
+
       case 'notification':
         return <NotificationPage onBack={() => setPage('main')} />
+
       case 'profile':
         return isLoggedIn ? (
           <ProfilePage
@@ -49,10 +53,13 @@ function App() {
             onRegister={() => setPage('register')}
           />
         )
+
       case 'register':
         return <RegisterPage onBack={() => setPage('profile')} />
+
       case 'write':
         return <WritePage onBack={() => setPage('main')} />
+
       case 'detail':
         return (
           <PostDetailPage
@@ -61,13 +68,29 @@ function App() {
             onParticipate={() => setPage('participate')}
           />
         )
+
       case 'participate':
-        return <ParticipatePage 
-          onBack={() => setPage('detail')} 
-          onChatting={() => setPage('chatting')}
+        return (
+          <ParticipatePage
+            onBack={() => setPage('detail')}
+            onChatting={() => setPage('chatting')}
           />
+        )
+
       case 'chatting':
         return <ChattingPage onBack={() => setPage('participate')} />
+
+      // ─────────────────────────────────────────────────────────────────
+      // (새로 추가) 채팅룸 페이지 분기
+      case 'chatroom':
+        return (
+          <ChatRoomPage
+            rooms={dummyPosts}             // 참여 중인 게시글(채팅방)을 넘겨줌
+            onBack={() => setPage('main')}  // 뒤로가기 시 메인으로 돌아가도록
+          />
+        )
+      // ─────────────────────────────────────────────────────────────────
+
       default:
         return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -80,17 +103,33 @@ function App() {
                 borderBottom: '1px solid #ddd',
               }}
             >
-              <button onClick={() => setPage('search')} style={{ fontSize: 18 }}>🔍</button>
-              <button onClick={() => setPage('notification')} style={{ fontSize: 18 }}>💬</button>
-              <button onClick={() => setPage('profile')} style={{ fontSize: 18 }}>👤</button>
+              <button onClick={() => setPage('search')} style={{ fontSize: 18 }} title="검색">
+                🔍
+              </button>
+
+              {/* 💬 → chatroom 으로 라우팅 */}
+              <button onClick={() => setPage('chatroom')} style={{ fontSize: 18 }} title="채팅룸">
+                💬
+              </button>
+
+              <button onClick={() => setPage('notification')} style={{ fontSize: 18 }} title="알림">
+                🔔
+              </button>
+
+              <button onClick={() => setPage('profile')} style={{ fontSize: 18 }} title="프로필">
+                👤
+              </button>
             </div>
 
             <div style={{ flex: 1, overflowY: 'auto' }}>
               {dummyPosts.map((post) => (
-                <div key={post.id} onClick={() => {
-                  setSelectedPost(post);
-                  setPage('detail');
-                }}>
+                <div
+                  key={post.id}
+                  onClick={() => {
+                    setSelectedPost(post)
+                    setPage('detail')
+                  }}
+                >
                   <PostCard
                     title={post.title}
                     category={post.category}
