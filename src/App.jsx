@@ -1,133 +1,172 @@
-// src/App.jsx
-import React, { useState } from 'react'
-import SearchPage from './components/SearchPage'
-import NotificationPage from './components/NotificationPage'
-import LoginPage from './components/LoginPage'
-import ProfilePage from './components/ProfilePage'
-import RegisterPage from './components/RegisterPage'
-import WritePage from './components/WritePage'
-import PostCard from './components/PostCard'
-import PostDetailPage from './components/PostDetailPage'
-import ParticipatePage from './components/ParticipatePage'
-import ChattingPage from './components/ChattingPage'
-import ChatRoomPage from './components/ChatRoomPage' // 추가
+import React, { useState } from "react";
+import SearchPage from "./components/SearchPage";
+import NotificationPage from "./components/NotificationPage";
+import LoginPage from "./components/LoginPage";
+import ProfilePage from "./components/ProfilePage";
+import RegisterPage from "./components/RegisterPage";
+import WritePage from "./components/WritePage";
+import PostCard from "./components/PostCard";
+import PostDetailPage from "./components/PostDetailPage";
+import ParticipatePage from "./components/ParticipatePage";
+import ChattingPage from "./components/ChattingPage";
+import ChatRoomPage from "./components/ChatRoomPage"; // 추가
 
 const dummyPosts = [
-  { id: 1, title: '생수 2L 인당 2개씩 공동구매할 분 구합니다', category: '생수', current: 2, total: 3 },
-  { id: 2, title: '햇반 18개 공동구매 구합니다!', category: '음식', current: 3, total: 6 },
-  { id: 3, title: '기숙사에 사는 사람 중 다우니 공구할 사람', category: '생활용품', current: 0, total: 2 },
-]
+  {
+    id: 1,
+    title: "생수 2L 인당 2개씩 공동구매할 분 구합니다",
+    category: "생수",
+    current: 2,
+    total: 3,
+  },
+  {
+    id: 2,
+    title: "햇반 18개 공동구매 구합니다!",
+    category: "음식",
+    current: 3,
+    total: 6,
+  },
+  {
+    id: 3,
+    title: "기숙사에 사는 사람 중 다우니 공구할 사람",
+    category: "생활용품",
+    current: 0,
+    total: 2,
+  },
+];
 
 function App() {
-  const [page, setPage] = useState('main')
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [selectedPost, setSelectedPost] = useState(null)
+  const [page, setPage] = useState("main");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
 
   const renderPage = () => {
     switch (page) {
-      case 'search':
-        return <SearchPage onBack={() => setPage('main')} />
+      case "search":
+        return <SearchPage onBack={() => setPage("main")} />;
 
-      case 'notification':
-        return <NotificationPage onBack={() => setPage('main')} />
+      case "notification":
+        return <NotificationPage onBack={() => setPage("main")} />;
 
-      case 'profile':
+      case "profile":
         return isLoggedIn ? (
           <ProfilePage
-            onBack={() => setPage('main')}
+            onBack={() => setPage("main")}
             onLogout={() => {
-              const confirmLogout = window.confirm('로그아웃 하시겠습니까?')
+              const confirmLogout = window.confirm("로그아웃 하시겠습니까?");
               if (confirmLogout) {
-                setIsLoggedIn(false)
-                setPage('main')
+                setIsLoggedIn(false);
+                setPage("main");
               }
             }}
           />
         ) : (
           <LoginPage
             onLogin={() => {
-              setIsLoggedIn(true)
-              setPage('main')
+              setIsLoggedIn(true);
+              setPage("main");
             }}
-            onBack={() => setPage('main')}
-            onRegister={() => setPage('register')}
+            onBack={() => setPage("main")}
+            onRegister={() => setPage("register")}
           />
-        )
+        );
 
-      case 'register':
-        return <RegisterPage onBack={() => setPage('profile')} />
+      case "register":
+        return <RegisterPage onBack={() => setPage("profile")} />;
 
-      case 'write':
-        return <WritePage onBack={() => setPage('main')} />
+      case "write":
+        return <WritePage onBack={() => setPage("main")} />;
 
-      case 'detail':
+      case "detail":
         return (
           <PostDetailPage
             post={selectedPost}
-            onBack={() => setPage('main')}
-            onParticipate={() => setPage('participate')}
+            onBack={() => setPage("main")}
+            onParticipate={() => setPage("participate")}
           />
-        )
+        );
 
-      case 'participate':
+      case "participate":
         return (
           <ParticipatePage
-            onBack={() => setPage('detail')}
-            onChatting={() => setPage('chatting')}
+            onBack={() => setPage("detail")}
+            onChatting={() => setPage("chatting")}
           />
-        )
+        );
 
-      case 'chatting':
-        return <ChattingPage onBack={() => setPage('participate')} />
+      case "chatting":
+        return <ChattingPage onBack={() => setPage("participate")} />;
 
       // ─────────────────────────────────────────────────────────────────
       // (새로 추가) 채팅룸 페이지 분기
-      case 'chatroom':
+      case "chatroom":
         return (
           <ChatRoomPage
-            rooms={dummyPosts}             // 참여 중인 게시글(채팅방)을 넘겨줌
-            onBack={() => setPage('main')}  // 뒤로가기 시 메인으로 돌아가도록
+            rooms={dummyPosts} // 참여 중인 게시글(채팅방)을 넘겨줌
+            onBack={() => setPage("main")} // 뒤로가기 시 메인으로 돌아가도록
           />
-        )
+        );
       // ─────────────────────────────────────────────────────────────────
 
       default:
         return (
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              height: "100vh",
+            }}
+          >
             <div
               style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
+                display: "flex",
+                justifyContent: "flex-end",
                 padding: 16,
                 gap: 12,
-                borderBottom: '1px solid #ddd',
+                borderBottom: "1px solid #ddd",
               }}
             >
-              <button onClick={() => setPage('search')} style={{ fontSize: 18 }} title="검색">
+              <button
+                onClick={() => setPage("search")}
+                style={{ fontSize: 18 }}
+                title="검색"
+              >
                 🔍
               </button>
 
               {/* 💬 → chatroom 으로 라우팅 */}
-              <button onClick={() => setPage('chatroom')} style={{ fontSize: 18 }} title="채팅룸">
+              <button
+                onClick={() => setPage("chatroom")}
+                style={{ fontSize: 18 }}
+                title="채팅룸"
+              >
                 💬
               </button>
 
-              <button onClick={() => setPage('notification')} style={{ fontSize: 18 }} title="알림">
+              <button
+                onClick={() => setPage("notification")}
+                style={{ fontSize: 18 }}
+                title="알림"
+              >
                 🔔
               </button>
 
-              <button onClick={() => setPage('profile')} style={{ fontSize: 18 }} title="프로필">
+              <button
+                onClick={() => setPage("profile")}
+                style={{ fontSize: 18 }}
+                title="프로필"
+              >
                 👤
               </button>
             </div>
 
-            <div style={{ flex: 1, overflowY: 'auto' }}>
+            <div style={{ flex: 1, overflowY: "auto" }}>
               {dummyPosts.map((post) => (
                 <div
                   key={post.id}
                   onClick={() => {
-                    setSelectedPost(post)
-                    setPage('detail')
+                    setSelectedPost(post);
+                    setPage("detail");
                   }}
                 >
                   <PostCard
@@ -142,21 +181,21 @@ function App() {
 
             <div
               style={{
-                borderTop: '1px solid #ddd',
+                borderTop: "1px solid #ddd",
                 padding: 12,
-                textAlign: 'center',
-                cursor: 'pointer',
+                textAlign: "center",
+                cursor: "pointer",
               }}
-              onClick={() => setPage('write')}
+              onClick={() => setPage("write")}
             >
               <span style={{ fontSize: 20 }}>✏️ 게시글 작성</span>
             </div>
           </div>
-        )
+        );
     }
-  }
+  };
 
-  return <>{renderPage()}</>
+  return <>{renderPage()}</>;
 }
 
-export default App
+export default App;
