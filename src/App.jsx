@@ -9,41 +9,125 @@ import WritePage from './components/WritePage'
 import PostCard from './components/PostCard'
 import PostDetailPage from './components/PostDetailPage'
 import ParticipatePage from './components/ParticipatePage'
+import PaymentPage from './components/PaymentPage'
+import WaitingPage from './components/WaitingPage'
 import ChattingPage from './components/ChattingPage'
 import ChatRoomPage from './components/ChatRoomPage'
 
-const dummyPosts = [
-  { id: 1, title: '생수 2L 인당 2개씩 공동구매할 분 구합니다', category: '생수', current: 2, total: 3 },
-  { id: 2, title: '햇반 18개 공동구매 구합니다!', category: '음식', current: 3, total: 6 },
-  { id: 3, title: '기숙사에 사는 사람 중 다우니 공구할 사람', category: '생활용품', current: 0, total: 2 },
+// -----------------------------------------------------------------------------
+// 현재 로그인한 사용자 (예시 데이터)
+const CURRENT_USER = {
+  id: 'user123',
+  name: '홍길동',
+}
+
+// ----------------------------------------------------------------------------
+// 초기 게시물 데이터
+let NEXT_POST_ID = 4
+const INITIAL_POSTS = [
+  {
+    id: 1,
+    authorId: 'user123',
+    authorName: '홍길동',
+    title: '생수 2L 인당 2개씩 공동구매할 분 구합니다',
+    category: '생수',
+    current: 2,
+    total: 3,
+    price: 99999,
+    deadline: '2025/07/01',
+  },
+  {
+    id: 2,
+    authorId: 'other456',
+    authorName: '정태선',
+    title: '햇반 18개 공동구매 구합니다!',
+    category: '음식',
+    current: 3,
+    total: 6,
+    price: 55000,
+    deadline: '2025/06/20',
+  },
+  {
+    id: 3,
+    authorId: 'user123',
+    authorName: '홍길동',
+    title: '기숙사에 사는 사람 중 다우니 공구할 사람',
+    category: '생활용품',
+    current: 0,
+    total: 2,
+    price: 15000,
+    deadline: '2025/07/15',
+  },
 ]
 
 function App() {
+  // 1) 전체 게시물 목록 state
+  const [posts, setPosts] = useState(INITIAL_POSTS)
+  // 2) 입금 확인되어 실제 채팅방에 입장한(=joined) 게시물 ID 목록
+  const [joinedPosts, setJoinedPosts] = useState([])
+  // 3) 현재 보여줄 페이지
   const [page, setPage] = useState('main')
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  // 4) 상세 페이지 등에서 선택된 게시물 객체
   const [selectedPost, setSelectedPost] = useState(null)
 
-  // (1) 참여한 게시물 ID 목록을 관리
-  const [joinedPosts, setJoinedPosts] = useState([])
-
-  // (2) SearchPage에서 선택된 게시물로 상세 페이지를 여는 핸들러
+  // ────────────────────────────────────────────────────────────────────────────
+  // SearchPage → 게시물 클릭 → 상세 페이지로 이동
   const handleSearchSelect = (post) => {
     setSelectedPost(post)
     setPage('detail')
   }
 
-  // (3) 참여한 게시물만 ChatRoomPage로 전달하기 위해 객체 배열 형태로 변환
-  const chatRooms = dummyPosts
-    .filter((p) => joinedPosts.includes(p.id))
-    .map((p) => ({ id: p.id, name: p.title }))
+  // ────────────────────────────────────────────────────────────────────────────
+  // PostDetailPage → “참여하기” 클릭 → 정보 입력 폼 페이지로 이동
+  const handleClickParticipate = (post) => {
+    setSelectedPost(post)
+    setPage('participate')
+  }
 
+  // ────────────────────────────────────────────────────────────────────────────
+  // ParticipatePage → “다음(입금 안내)” 클릭
+  // participantInfo: { name, studentId, dept, phone, email, dorm, bank, refundAccount }
+  const handleGoToPayment = (postId, participantInfo) => {
+    setSelectedPost((prev) => ({ ...prev, participantInfo }))
+    setPage('payment')
+  }
+
+  // ────────────────────────────────────────────────────────────────────────────
+  // PaymentPage → “입금 완료” 클릭 → 입금 대기 페이지로 이동
+  const handlePaymentDone = () => {
+    setPage('waiting')
+  }
+
+  // ────────────────────────────────────────────────────────────────────────────
+  // WaitingPage → “입금 확인 완료” 클릭 → 실제로 채팅방 참여 처리 후 ChattingPage로 이동
+  const handleDepositConfirmed = () => {
+    if (selectedPost && selectedPost.id) {
+      setJoinedPosts((prev) => {
+        if (!prev.includes(selectedPost.id)) {
+          return [...prev, selectedPost.id]
+        }
+        return prev
+      })
+    }
+    setPage('chatting')
+  }
+
+  // ────────────────────────────────────────────────────────────────────────────
+  // 채팅방 목록에서 “나가기” 클릭 시 → joinedPosts에서 해당 ID 제거 → 메인으로 이동
+  const handleChatLeave = (roomId) => {
+    setJoinedPosts((prev) => prev.filter((id) => id !== roomId))
+    setPage('main')
+  }
+
+  // ────────────────────────────────────────────────────────────────────────────
+  // 페이지 렌더링 분기
   const renderPage = () => {
     switch (page) {
-      // ─────────────────────────────────────────────────────────────────
+      // ──────────────────────────────────────────────────────────────────────────
       case 'search':
         return (
           <SearchPage
-            posts={dummyPosts.filter((p) => !joinedPosts.includes(p.id))}
+            posts={posts.filter((p) => !joinedPosts.includes(p.id))}
             onBack={() => setPage('main')}
             onSelect={handleSearchSelect}
           />
@@ -53,23 +137,16 @@ function App() {
         return <NotificationPage onBack={() => setPage('main')} />
 
       case 'profile':
-        return isLoggedIn ? (
+        return CURRENT_USER ? (
           <ProfilePage
             onBack={() => setPage('main')}
             onLogout={() => {
-              const confirmLogout = window.confirm('로그아웃 하시겠습니까?')
-              if (confirmLogout) {
-                setIsLoggedIn(false)
-                setPage('main')
-              }
+              setPage('main')
             }}
           />
         ) : (
           <LoginPage
-            onLogin={() => {
-              setIsLoggedIn(true)
-              setPage('main')
-            }}
+            onLogin={() => setPage('main')}
             onBack={() => setPage('main')}
             onRegister={() => setPage('register')}
           />
@@ -81,60 +158,83 @@ function App() {
       case 'write':
         return <WritePage onBack={() => setPage('main')} />
 
-      // ─────────────────────────────────────────────────────────────────
+      // ──────────────────────────────────────────────────────────────────────────
       case 'detail':
+        if (!selectedPost) {
+          return <div style={{ padding: 16 }}>게시물을 찾을 수 없습니다.</div>
+        }
         return (
           <PostDetailPage
             post={selectedPost}
             onBack={() => setPage('main')}
-            onParticipate={() => {
-              // 참여하기 누르면 joinedPosts에 ID를 추가
-              if (!joinedPosts.includes(selectedPost.id)) {
-                setJoinedPosts((prev) => [...prev, selectedPost.id])
-              }
-              setPage('participate')
-            }}
+            onParticipate={() => handleClickParticipate(selectedPost)}
           />
         )
 
+      // ──────────────────────────────────────────────────────────────────────────
       case 'participate':
         return (
           <ParticipatePage
+            post={selectedPost}
             onBack={() => setPage('detail')}
-            onChatting={() => setPage('chatroom')}
-            onLeave={() => {
-              // 이 부분을 “나가기” → ChatRoomPage에서 보던 방식 → 이제 메인으로 복귀
-              setPage('main')
-            }}
+            onNext={handleGoToPayment}
           />
         )
 
-      case 'chatting':
-        return <ChattingPage onBack={() => setPage('participate')} />
+      // ──────────────────────────────────────────────────────────────────────────
+      case 'payment':
+        return (
+          <PaymentPage
+            post={selectedPost}
+            onBack={() => setPage('participate')}
+            onPaymentDone={handlePaymentDone}
+          />
+        )
 
-      // ─────────────────────────────────────────────────────────────────
-      case 'chatroom':
+      // ──────────────────────────────────────────────────────────────────────────
+      case 'waiting':
+        return (
+          <WaitingPage
+            post={selectedPost}
+            onBack={() => setPage('payment')}
+            onDepositConfirmed={handleDepositConfirmed}
+          />
+        )
+
+      // ──────────────────────────────────────────────────────────────────────────
+      case 'chatroom': {
+        const rooms = posts
+          .filter((p) => joinedPosts.includes(p.id))
+          .map((p) => ({ id: p.id, name: p.title }))
         return (
           <ChatRoomPage
-            rooms={chatRooms}
+            rooms={rooms}
             onBack={() => setPage('main')}
-            onLeave={(roomId) => {
-              // “나가기” 클릭 시 해당 roomId를 joinedPosts에서 제거
-              setJoinedPosts((prev) => prev.filter((id) => id !== roomId))
-              // 채팅방 목록 화면 → 메인 화면으로 돌아가기
-              setPage('main')
+            onLeave={handleChatLeave}
+          />
+        )
+      }
+
+      case 'chatting':
+        return (
+          <ChattingPage
+            onBack={() => {
+              // 뒤로가기 시, 여전히 참여 중이면 채팅방 목록으로, 아니면 메인으로
+              if (selectedPost && joinedPosts.includes(selectedPost.id)) {
+                setPage('chatroom')
+              } else {
+                setPage('main')
+              }
             }}
           />
         )
-      // ─────────────────────────────────────────────────────────────────
 
+      // ──────────────────────────────────────────────────────────────────────────
       default:
-        // 메인 화면: joinedPosts에 포함되지 않는 게시물만 보이도록 필터링
-        const visiblePosts = dummyPosts.filter((post) => !joinedPosts.includes(post.id))
-
+        const visiblePosts = posts.filter((post) => !joinedPosts.includes(post.id))
         return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-            {/* 상단 헤더: 검색, 채팅룸, 알림, 프로필 버튼 */}
+            {/* 상단 헤더: 검색, 채팅룸, 알림, 프로필 */}
             <div
               style={{
                 display: 'flex',
@@ -144,7 +244,6 @@ function App() {
                 borderBottom: '1px solid #ddd',
               }}
             >
-              {/* 검색 버튼 */}
               <button
                 onClick={() => setPage('search')}
                 style={{ fontSize: 18 }}
@@ -152,8 +251,6 @@ function App() {
               >
                 🔍
               </button>
-
-              {/* 채팅룸 버튼 */}
               <button
                 onClick={() => setPage('chatroom')}
                 style={{ fontSize: 18 }}
@@ -161,8 +258,6 @@ function App() {
               >
                 💬
               </button>
-
-              {/* 알림 버튼 */}
               <button
                 onClick={() => setPage('notification')}
                 style={{ fontSize: 18 }}
@@ -170,8 +265,6 @@ function App() {
               >
                 🔔
               </button>
-
-              {/* 프로필 버튼 */}
               <button
                 onClick={() => setPage('profile')}
                 style={{ fontSize: 18 }}
@@ -181,7 +274,7 @@ function App() {
               </button>
             </div>
 
-            {/* 게시글 목록 (스크롤 가능) */}
+            {/* 게시물 목록 */}
             <div style={{ flex: 1, overflowY: 'auto' }}>
               {visiblePosts.length === 0 ? (
                 <div
@@ -214,7 +307,7 @@ function App() {
               )}
             </div>
 
-            {/* 하단 고정: 게시글 작성 버튼 */}
+            {/* 하단: 게시물 작성 버튼 */}
             <div
               style={{
                 borderTop: '1px solid #ddd',
