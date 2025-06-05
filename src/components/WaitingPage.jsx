@@ -1,5 +1,6 @@
 import React from "react";
 import Header from "./Header";
+import moisamLogo from "../assets/moisam.png"; // 상대 경로로 불러오기
 
 function WaitingPage({ post, onBack, onDepositConfirmed }) {
   if (!post) {
@@ -20,8 +21,11 @@ function WaitingPage({ post, onBack, onDepositConfirmed }) {
         }}
       >
         <img
+          src={moisamLogo}
+          alt="MOISAM Logo"
           style={{ width: 150, marginBottom: 24 }}
         />
+
         <p style={{ fontSize: 16, color: "#555", marginBottom: 32 }}>
           입금내역이 확인되면 알려드릴게요!
         </p>
