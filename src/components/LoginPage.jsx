@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Header from './Header'
+import { GoogleLogin } from '@react-oauth/google'
 
 function LoginPage({ onLogin, onBack, onRegister }) {
   const [email, setEmail] = useState('')
@@ -10,6 +11,25 @@ function LoginPage({ onLogin, onBack, onRegister }) {
       onLogin()
     } else {
       alert('이메일과 비밀번호를 입력해주세요.')
+    }
+  }
+
+  const handleGoogleLoginSuccess = async (credentialResponse) => {
+    try {
+      const res = await fetch('http://localhost:5000/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: credentialResponse.credential }),
+      })
+      const data = await res.json()
+      if (data.status === 'success') {
+        onLogin()  // 로그인 성공 시 페이지 전환
+      } else {
+        alert('구글 로그인 실패: ' + data.message)
+      }
+    } catch (err) {
+      console.error(err)
+      alert('서버 통신 오류가 발생했습니다.')
     }
   }
 
@@ -53,7 +73,15 @@ function LoginPage({ onLogin, onBack, onRegister }) {
       >
         Login
       </button>
-      
+
+      <div style={{ marginTop: 24, textAlign: 'center' }}>
+        <GoogleLogin
+          onSuccess={handleGoogleLoginSuccess}
+          onError={() => {
+            alert('Google 로그인에 실패했습니다.')
+          }}
+        />
+      </div>
 
       <p style={{ marginTop: 16, textAlign: 'center' }}>
         Not a member?{' '}
