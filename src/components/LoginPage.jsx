@@ -2,6 +2,23 @@ import { useState } from 'react'
 import Header from './Header'
 import { GoogleLogin } from '@react-oauth/google'
 
+function parseJwt(token) {
+  try {
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    )
+    return JSON.parse(jsonPayload)
+  } catch (e) {
+    console.error('Invalid JWT:', e)
+    return {}
+  }
+}
+
 function LoginPage({ onLogin, onBack, onRegister }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,14 +33,24 @@ function LoginPage({ onLogin, onBack, onRegister }) {
 
   const handleGoogleLoginSuccess = async (credentialResponse) => {
     try {
-      const res = await fetch('http://localhost:5000/auth/google', {
+      const decoded = parseJwt(credentialResponse.credential)
+      const email = decoded.email
+  
+      const res = await fetch('http://192.168.200.110:5000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: credentialResponse.credential }),
+        body: JSON.stringify({ ajou_email: email }),
       })
+  
       const data = await res.json()
+  
       if (data.status === 'success') {
-        onLogin()  // 로그인 성공 시 페이지 전환
+        const userInfo = {
+          google_id: decoded.sub,
+          ajou_email: decoded.email,
+          name: decoded.name || ''
+        }
+        onLogin(userInfo)  // 로그인 성공 시 페이지 전환
       } else {
         alert('구글 로그인 실패: ' + data.message)
       }

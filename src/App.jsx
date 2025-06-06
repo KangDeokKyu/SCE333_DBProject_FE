@@ -159,11 +159,11 @@ function App() {
   // ────────────────────────────────────────────────────────────────────────────
   // (H) 로그인 처리: LoginPage → “로그인” 버튼 클릭 시 호출
   //     dummy 예시로 아이디/비밀번호 입력 없이 즉시 로그인 처리
-  const handleLogin = (credentials) => {
+  const handleLogin = (userInfo) => {
     // 실제 구현 시 백엔드 인증 로직 필요
     // credentials: { username, password }
     setIsLoggedIn(true);
-    setCurrentUser(DUMMY_USER);
+    setCurrentUser(userInfo);
     setPage("main");
   };
 
@@ -200,7 +200,7 @@ function App() {
       // ──────────────────────────────────────────────────────────────────────────
       case "profile":
         return isLoggedIn ? (
-          <ProfilePage onBack={() => setPage("main")} onLogout={handleLogout} />
+          <ProfilePage user={currentUser} onBack={() => setPage("main")} onLogout={handleLogout} />
         ) : (
           <LoginPage onLogin={handleLogin} onBack={() => setPage("main")} onRegister={() => setPage("register")} />
         );

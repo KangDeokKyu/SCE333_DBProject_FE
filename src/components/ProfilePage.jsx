@@ -1,16 +1,17 @@
 import Header from './Header'
 
-function ProfilePage({ onBack, onLogout }) {
+function ProfilePage({ user, onBack, onLogout }) {
   return (
     <div>
       <Header title="프로필" onBack={onBack} />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
-        <button>내 정보</button>
-        <button>거래 기록</button>
-        <button onClick={onLogout}>로그아웃</button>
+      <div style={{ padding: 16 }}>
+        <p><strong>이름:</strong> {user?.name}</p>
+        <p><strong>이메일:</strong> {user?.ajou_email}</p>
+        <button onClick={onLogout} style={{ marginTop: 24 }}>로그아웃</button>
       </div>
     </div>
   )
 }
+
 
 export default ProfilePage
